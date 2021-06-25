@@ -1,0 +1,19 @@
+conf:
+  timeout: 60
+
+exec_list:
+  - expect: 'password:'
+    exec: "{{ __loginpassword__ }}"
+  - expect: 'root@'
+    exec: /usr/bin/cp -f '{{ CPF_01 }}' /temp/{{ __loginhostname__ }}_CPF_01.txt
+  - expect: 'root@'
+    exec: /usr/bin/cp -f '{{ TPF_01 }}' /temp/{{ __loginhostname__ }}_TPF_01.txt
+  - expect: 'root@'
+    exec: echo '{{ GBL_01 }}'
+  - expect: 'root@'
+    exec: echo '{{ VAR_01 }}'
+#  - expect: 'root@'
+#    exec: echo '{{ VAR_02 }}'
+#  - expect: 'root@'
+#    exec: echo '{{ VAR_03 }}'
+

@@ -1,0 +1,5 @@
+- name: Collect Files host
+  fetch:
+    src=/etc/hosts
+    dest={{ __workflowdir__ }}/{{ inventory_hostname }}
+    flat=yes
