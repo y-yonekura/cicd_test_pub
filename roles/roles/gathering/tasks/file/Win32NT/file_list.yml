@@ -1,0 +1,15 @@
+---
+- name: Get file list
+  win_shell: |-
+    $ls = if (Test-Path {{ _path }} -PathType Leaf) {
+        Get-ChildItem {{ _path }}
+    } elseif (Test-Path {{ _path }} -PathType Container) {
+        if ("{{ _file.depth|d }}" -and $PSVersionTable.PSVersion -ge "5.0") {
+            Get-ChildItem {{ _path }} -Recurse -File -Depth {{ _file.depth|d|int - 1 }}
+        } else {
+            Get-ChildItem {{ _path }} -Recurse -File
+        }
+    }
+    $ls | % FullName
+  changed_when: no
+  register: i_gathering_file_found

@@ -1,0 +1,31 @@
+---
+- name: Init file list
+  set_fact:
+    i_gathering_file_list: []
+
+- name: Convert file list to dict
+  set_fact:
+    i_gathering_file_list: >-
+      {{
+      i_gathering_file_list +
+      [(item is mapping) | ternary(item, {'name': item})]
+      }}
+  with_items: "{{ i_gathering_definition_list }}"
+
+- include_tasks: fetch.yml
+  with_items: "{{ i_gathering_file_list }}"
+  loop_control:
+    loop_var: _file
+
+# fetchはinventory_hostnameのディレクトリを作ってファイルを格納するため
+# 全ファイルを一段上のディレクトリに移動し、ディレクトリを削除する
+- name: Move files to parent directory
+  shell: |-
+    shopt -s dotglob
+    mv -f "{{ i_gathered_data_dest }}/{{ inventory_hostname }}"/* "{{ i_gathered_data_dest }}"
+    rm -rf "{{ i_gathered_data_dest }}/{{ inventory_hostname }}"
+  args:
+    removes: "{{ i_gathered_data_dest }}/{{ inventory_hostname }}"
+  delegate_to: localhost
+  become: no
+  when: (i_gathering_file_list|length>0)

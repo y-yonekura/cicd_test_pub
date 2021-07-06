@@ -1,0 +1,8 @@
+---
+- name: Get file list
+  shell: |-
+    if [ -e {{ _path }} ]; then
+        find {{ _file.symlink | d | ternary('-L', '') }} {{ _path }} -maxdepth {{ _file.depth | d(999) }} -type f
+    fi
+  changed_when: no
+  register: i_gathering_file_found

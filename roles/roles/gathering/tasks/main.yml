@@ -1,0 +1,55 @@
+---
+# ラベルを大域的に保持し、ラベルが変更されたら時刻を更新する
+#
+# Global変数を動的に定義する方法が不明なので、
+# 制御ホストにdelegate_factsした変数をGlobal変数の代わりとする。
+# run_onceを指定すると問題があるため、全ホストから制御ホストにdelegate_toする。
+# (呼出側playでskipされたホストがrun_onceで選択されうるため)
+
+- name: Update datetime
+  setup:
+  delegate_to: localhost
+  become: no
+  delegate_facts: yes
+  when:
+    hostvars['localhost'].i_gathering_label is undefined or
+    hostvars['localhost'].i_gathering_label != VAR_gathering_label
+
+- name: Save label
+  set_fact:
+    i_gathering_label: "{{ VAR_gathering_label }}"
+  delegate_to: localhost
+  become: no
+  delegate_facts: yes
+
+# ロールパスが指定されていたらロール内の収集情報定義をロードする
+- name: Load gathering definition role
+  include_vars:
+    file: "{{ VAR_gathering_definition_role_path }}/vars/gathering_definition.yml"
+    name: i_gathering_definition_role1
+  when: VAR_gathering_definition_role_path is defined
+
+- name: Set gathering definition
+  set_fact:
+    i_gathering_definition_role2: >-
+      {{
+      VAR_gathering_definition_role_path | d | ternary(i_gathering_definition_role1, {})
+      }}
+
+# 収集情報格納先ディレクトリ名を生成
+- name: Set gathered_data_dest
+  set_fact:
+    gathered_data_dest: >-
+      {{ VAR_gathering_root }}/_gathered_data/{{
+      hostvars['localhost'].ansible_date_time.iso8601_basic_short +
+      VAR_gathering_label | ternary('_' + VAR_gathering_label, '')
+      }}/{{ inventory_hostname }}
+
+# 各情報の収集を実行
+- include_tasks: common.yml
+  with_items: >-
+    {{
+    ((VAR_gathering_definition | d({})).keys() | list) | union((i_gathering_definition_role2.keys() | list))
+    }}
+  loop_control:
+    loop_var: i_gathering_definition_type

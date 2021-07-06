@@ -1,0 +1,9 @@
+---
+# win_shellだと出力が文字化けするのでrawで実行
+- name: Exec commands
+  raw: >-
+    {{ item }}
+  with_items: "{{ i_gathering_definition_list }}"
+  failed_when: no
+  changed_when: no
+  register: i_gathering_command_result

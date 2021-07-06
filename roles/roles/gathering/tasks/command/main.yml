@@ -1,0 +1,15 @@
+---
+- include_tasks: "{{ ansible_system }}/exec.yml"
+
+- name: Save command results in JSON
+  copy:
+    content: >-
+      {{ i_gathering_command_result.results | to_nice_json }}
+    dest: "{{ i_gathered_data_dest }}/results.json"
+  delegate_to: localhost
+  become: no
+
+- include_tasks: save_file.yml
+  with_indexed_items: "{{ i_gathering_command_result.results }}"
+  loop_control:
+    loop_var: _indexed_result
