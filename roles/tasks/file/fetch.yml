@@ -1,0 +1,17 @@
+---
+# 現状fetchでは再帰取得ができないのでファイル単位で取得する必要あり
+# Recursive fetching may be supported in a later release.
+
+# 指定されたパス配下のファイル一覧を取得
+# パスはquote属性で指定された文字で括る (既定値はsingle quote)
+- include_tasks: "{{ ansible_system }}/file_list.yml"
+  vars:
+    _path: >-
+      {{ _file.quote | d("'") }}{{ _file.name }}{{ _file.quote | d("'") }}
+
+- name: Fetch files
+  fetch:
+    src: "{{ item }}"
+    dest: "{{ i_gathered_data_dest }}"
+  with_items: "{{ i_gathering_file_found.stdout_lines }}"
+  when: not ansible_check_mode

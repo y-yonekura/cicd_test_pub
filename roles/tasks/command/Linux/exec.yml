@@ -1,0 +1,8 @@
+---
+- name: Exec commands
+  shell: >-
+    {{ item }}
+  with_items: "{{ i_gathering_definition_list }}"
+  failed_when: no
+  changed_when: no
+  register: i_gathering_command_result
