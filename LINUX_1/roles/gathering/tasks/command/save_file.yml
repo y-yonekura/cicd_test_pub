@@ -1,0 +1,23 @@
+---
+- block:
+    - name: Create per-command directory
+      file:
+        path: "{{ i_gathered_data_dest }}/{{ _index }}"
+        state: directory
+
+    - name: Save command results
+      copy:
+        content: >-
+          {{ _result[item] }}
+        dest: "{{ i_gathered_data_dest }}/{{ _index }}/{{ item }}.txt"
+      with_items:
+        - item
+        - rc
+        - stdout
+        - stderr
+      when: not ansible_check_mode
+  vars:
+    _index: "{{ _indexed_result.0 }}"
+    _result: "{{ _indexed_result.1 }}"
+  delegate_to: localhost
+  become: no

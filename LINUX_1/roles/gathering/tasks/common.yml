@@ -1,0 +1,28 @@
+---
+# 各情報収集前の共通処理
+
+# 収集情報格納先ディレクトリ作成
+- name: Set dest directory name
+  set_fact:
+    i_gathered_data_dest: >-
+      {{ gathered_data_dest }}/{{ i_gathering_definition_type }}
+
+- name: Create directory {{ i_gathered_data_dest }}
+  file:
+    path: "{{ i_gathered_data_dest }}"
+    state: directory
+  delegate_to: localhost
+  become: no
+
+# ターゲットのfacts未収集の場合は収集
+- name: Get OS type
+  setup:
+  when: ansible_system is undefined
+
+- include_tasks: "{{ i_gathering_definition_type }}/main.yml"
+  vars:
+    i_gathering_definition_list: >-
+      {{
+      (VAR_gathering_definition | d({}))[i_gathering_definition_type] | d([]) |
+      union(i_gathering_definition_role2[i_gathering_definition_type] | d([]))
+      }}

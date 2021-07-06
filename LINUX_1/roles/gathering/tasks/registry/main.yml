@@ -1,0 +1,17 @@
+---
+- block:
+    # powershellではレジストリキーを
+    # HKLM:\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate\AU\
+    # と記述できるが、regコマンドは':'や末尾の'\'があるとエラーになる。
+    # powershellの形式で指定されても通るようにするため、次のように変換する。
+    # HKLM\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate\AU
+    - include_tasks: reg_export.yml
+      vars:
+        _regkey: >-
+          {{ item | replace(':','') | regex_replace('\\*$','') }}
+      with_items: "{{ i_gathering_definition_list }}"
+  always:
+    - name: Cleanup .reg file
+      win_file:
+        path: export.reg
+        state: absent

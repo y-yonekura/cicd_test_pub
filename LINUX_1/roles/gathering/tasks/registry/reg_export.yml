@@ -1,0 +1,32 @@
+---
+# runasでbecomeするとカレントディレクトリが C:\Users\Administrator ではなく
+# C:\Windows になる。ただしrawについては C:\Users\Administrator のまま。
+# rawでファイルを作成すると後続のfetchでエラーになるため、win_shellを利用。
+# (ansible 2.4.1.0)
+- name: Export {{ _regkey }}
+  win_shell: |-
+    reg query "{{ _regkey }}"; $null
+    if ($LastExitCode -eq 0) {
+        $null = reg export "{{ _regkey }}" export.reg /y
+    }
+  register: i_gathering_reg_query
+  changed_when: i_gathering_reg_query.stdout
+
+- block:
+    - name: Create dest directory
+      file:
+        path: >-
+          {{ i_gathered_data_dest }}/{{ _regkey | regex_replace('\\','/') }}
+        state: directory
+      delegate_to: localhost
+      become: no
+
+    - name: Fetch .reg file
+      fetch:
+        src: export.reg
+        dest: >-
+          {{ i_gathered_data_dest }}/{{ _regkey | regex_replace('\\','/') }}/
+        flat: yes
+  when:
+    - not ansible_check_mode
+    - i_gathering_reg_query.stdout
