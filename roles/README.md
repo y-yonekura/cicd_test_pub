@@ -159,7 +159,7 @@ VAR_gathering_definition_role_pathパラメータとVAR_gathering_definitionパ�
 
 #### VAR_gathering_label
 情報収集タイミングを示すラベル。
-連続するロールの収集結果を同じ日時のディレクトリに格納するには、
+連続するロールの収集結果を同じ日時のディレdfghjklクトリに格納するには、
 各ロールの実行時に同じラベルを指定する。
 別のラベルを指定すると、日時が再設定される。 
 
