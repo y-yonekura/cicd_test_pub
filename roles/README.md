@@ -3,8 +3,7 @@ gathering
 
 ## Trademarks
 - Linuxは、Linus Torvalds氏の米国およびその他の国における登録商標または商標です。
-- RedHat、RHEL、CentOSは、Red Hat, Inc.の米国およびその他の国における登録商標または商標です。
-- Windows、PowerShellは、Microsoft Corporation の米国およびその他の国における登録商標または商標です。
+- RedHat、RH Corporation の米国およびその他の国における登録商標または商標です。
 - Ansibleは、Red Hat, Inc.の米国およびその他の国における登録商標または商標です。
 - pythonは、Python Software Foundationの登録商標または商標です。
 - NECは、日本電気株式会社の登録商標または商標です。
